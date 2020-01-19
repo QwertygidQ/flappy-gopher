@@ -9,7 +9,9 @@ import (
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
+	"github.com/faiface/pixel/text"
 	"golang.org/x/image/colornames"
+	"golang.org/x/image/font/basicfont"
 )
 
 func loadSprite(path string) *pixel.Sprite {
@@ -49,6 +51,11 @@ func run() {
 	win := setupWindow()
 
 	var (
+		basicAtlas = text.NewAtlas(basicfont.Face7x13, text.ASCII)
+		scoreText  = text.New(pixel.V(15, win.Bounds().H()-30), basicAtlas)
+	)
+
+	var (
 		pipeSprite   = loadSprite("img/pipe.png")
 		playerSprite = loadSprite("img/gopher.png")
 		drawTarget   = pixel.Target(win)
@@ -62,6 +69,8 @@ func run() {
 	)
 
 	for !win.Closed() {
+		win.Update()
+
 		// Delta time calculations
 		dt := time.Since(lastTime).Seconds()
 		_ = dt
@@ -87,7 +96,9 @@ func run() {
 		pipeMat = pipeMat.Moved(pixel.V(win.Bounds().Center().X*3/4, win.Bounds().H()))
 		pipeSprite.Draw(win, pipeMat)
 
-		win.Update()
+		scoreText.Clear()
+		fmt.Fprintf(scoreText, "Score: %d", world.player.score)
+		scoreText.Draw(win, pixel.IM.Scaled(scoreText.Orig, 2))
 	}
 }
 
