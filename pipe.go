@@ -5,6 +5,7 @@ import "github.com/faiface/pixel"
 type Pipe struct {
 	rect     pixel.Rect
 	inverted bool
+	passed   bool
 }
 
 func (p *Pipe) update(dt float64) {

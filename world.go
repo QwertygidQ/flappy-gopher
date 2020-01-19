@@ -57,13 +57,23 @@ func (w *World) makePipe() {
 
 func (w *World) update(dt float64, spaceJustPressed bool) (gameOver bool) {
 	w.player.update(dt, spaceJustPressed)
+	if w.player.rect.Min.Y <= 0 || w.player.rect.Max.Y >= w.targetRect.H() {
+		gameOver = true
+		return
+	}
 
 	newPipes := make([]*Pipe, 0)
 	for _, pipe := range w.pipes {
 		pipe.update(dt)
+
 		if w.player.rect.Intersects(pipe.rect) {
 			gameOver = true
+			return
+		} else if !pipe.passed && w.player.rect.Center().X >= pipe.rect.Center().X {
+			w.player.score++
+			pipe.passed = true
 		}
+
 		if pipe.rect.Max.X >= 0 {
 			newPipes = append(newPipes, pipe)
 		}
