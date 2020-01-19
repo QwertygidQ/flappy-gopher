@@ -116,7 +116,7 @@ func run() {
 		frames++
 		select {
 		case <-ticker:
-			win.SetTitle(fmt.Sprintf("Flappy Gopher| FPS: %d ", frames))
+			win.SetTitle(fmt.Sprintf("Flappy Gopher | FPS: %d ", frames))
 			frames = 0
 		default:
 		}
