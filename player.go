@@ -10,8 +10,10 @@ type Player struct {
 	score  int
 }
 
+const scaleFactor float64 = .12
+
 func newPlayer(rect pixel.Rect, startPos pixel.Vec) *Player {
-	rect = rect.Resized(pixel.ZV, rect.Size().Scaled(.15))
+	rect = rect.Resized(pixel.ZV, rect.Size().Scaled(scaleFactor))
 	rect = rect.Moved(startPos)
 	return &Player{rect: rect}
 }
@@ -29,8 +31,6 @@ func (p *Player) update(dt float64, spacePressed bool) {
 }
 
 func (p *Player) draw(target *pixel.Target, sprite *pixel.Sprite) {
-	const scaleFactor float64 = .15
-
 	playerMat := pixel.IM.Scaled(pixel.ZV, scaleFactor)
 	playerMat = playerMat.Moved(p.rect.Center())
 	sprite.Draw(*target, playerMat)

@@ -2,6 +2,7 @@ package main
 
 import (
 	"math/rand"
+	"time"
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
@@ -13,6 +14,7 @@ type World struct {
 
 	pipeSprite *pixel.Sprite
 	pipes      []*Pipe
+	pipeTicker <-chan time.Time
 
 	playerSprite *pixel.Sprite
 	player       *Player
@@ -33,6 +35,7 @@ func newWorld(
 		targetRect:   targetRect,
 		pipeSprite:   pipeSprite,
 		playerSprite: playerSprite,
+		pipeTicker:   time.Tick(time.Second * 3),
 		player:       player,
 	}
 }
@@ -66,6 +69,12 @@ func (w *World) update(dt float64, spaceJustPressed bool) (gameOver bool) {
 		}
 	}
 	w.pipes = newPipes
+
+	select {
+	case <-w.pipeTicker:
+		w.makePipe()
+	default:
+	}
 
 	return
 }

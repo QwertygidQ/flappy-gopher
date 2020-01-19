@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image"
 	_ "image/png"
+	"math/rand"
 	"os"
 	"time"
 
@@ -63,10 +64,7 @@ func run() {
 		drawTarget   = pixel.Target(win)
 		world        = newWorld(&drawTarget, win.Bounds(), pipeSprite, playerSprite)
 	)
-
-	for i := 0; i < 7; i++ {
-		world.makePipe()
-	}
+	world.makePipe()
 
 	var (
 		lastTime = time.Now()
@@ -108,5 +106,6 @@ func run() {
 }
 
 func main() {
+	rand.Seed(time.Now().Unix())
 	pixelgl.Run(run)
 }
