@@ -2,10 +2,7 @@ package main
 
 import (
 	"fmt"
-	"image"
-	_ "image/png"
 	"math/rand"
-	"os"
 	"time"
 
 	"github.com/faiface/pixel"
@@ -16,24 +13,6 @@ import (
 )
 
 const debug bool = false
-
-func loadSprite(path string) *pixel.Sprite {
-	file, err := os.Open(path)
-	if err != nil {
-		panic(err)
-	}
-	defer file.Close()
-
-	img, _, err := image.Decode(file)
-	if err != nil {
-		panic(err)
-	}
-
-	picture := pixel.PictureDataFromImage(img)
-	sprite := pixel.NewSprite(picture, picture.Bounds())
-
-	return sprite
-}
 
 func setupWindow() *pixelgl.Window {
 	cfg := pixelgl.WindowConfig{
@@ -50,26 +29,43 @@ func setupWindow() *pixelgl.Window {
 	return win
 }
 
-func run() {
-	win := setupWindow()
+func setupScoreText(targetRect pixel.Rect) *text.Text {
+	basicAtlas := text.NewAtlas(basicfont.Face7x13, text.ASCII)
+	scoreText := text.New(pixel.V(15, targetRect.H()-30), basicAtlas)
 
-	var (
-		basicAtlas = text.NewAtlas(basicfont.Face7x13, text.ASCII)
-		scoreText  = text.New(pixel.V(15, win.Bounds().H()-30), basicAtlas)
-	)
+	return scoreText
+}
 
+func setupSoundHandler() *SoundHandler {
 	soundHandler := initBeep(48000)
 	soundHandler.loadSound("snd/jetpack.wav", "jetpack")
 	soundHandler.loadSound("snd/pipe_passed.wav", "pipe_passed")
 	soundHandler.playSound("jetpack", true)
 
+	return soundHandler
+}
+
+func setupWorld(target *pixel.Target, targetRect pixel.Rect, soundHandler *SoundHandler) *World {
 	var (
 		pipeSprite   = loadSprite("img/pipe.png")
 		playerSprite = loadSprite("img/gopher.png")
-		drawTarget   = pixel.Target(win)
-		world        = newWorld(&drawTarget, win.Bounds(), soundHandler, pipeSprite, playerSprite)
+		world        = newWorld(target, targetRect, soundHandler, pipeSprite, playerSprite)
 	)
 	world.makePipe()
+
+	return world
+}
+
+func run() {
+	win := setupWindow()
+
+	scoreText := setupScoreText(win.Bounds())
+	soundHandler := setupSoundHandler()
+
+	var (
+		drawTarget = pixel.Target(win)
+		world      = setupWorld(&drawTarget, win.Bounds(), soundHandler)
+	)
 
 	var (
 		lastTime = time.Now()
@@ -88,7 +84,7 @@ func run() {
 		frames++
 		select {
 		case <-ticker:
-			win.SetTitle(fmt.Sprintf("Flappy gopher| FPS: %d ", frames))
+			win.SetTitle(fmt.Sprintf("Flappy Gopher| FPS: %d ", frames))
 			frames = 0
 		default:
 		}
