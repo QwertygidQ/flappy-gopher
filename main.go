@@ -62,6 +62,10 @@ func run() {
 		world        = newWorld(&drawTarget, win.Bounds(), pipeSprite, playerSprite)
 	)
 
+	for i := 0; i < 7; i++ {
+		world.makePipe()
+	}
+
 	var (
 		lastTime = time.Now()
 		frames   = 0
@@ -90,11 +94,8 @@ func run() {
 
 		// Drawing
 		win.Clear(colornames.Skyblue)
-		world.draw()
 
-		pipeMat := pixel.IM.Moved(pixel.V(0, -pipeSprite.Frame().H()/2))
-		pipeMat = pipeMat.Moved(pixel.V(win.Bounds().Center().X*3/4, win.Bounds().H()))
-		pipeSprite.Draw(win, pipeMat)
+		world.draw()
 
 		scoreText.Clear()
 		fmt.Fprintf(scoreText, "Score: %d", world.player.score)
