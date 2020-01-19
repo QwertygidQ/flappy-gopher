@@ -4,6 +4,7 @@ import (
 	"math/rand"
 
 	"github.com/faiface/pixel"
+	"github.com/faiface/pixel/imdraw"
 )
 
 type World struct {
@@ -51,20 +52,44 @@ func (w *World) makePipe() {
 	w.pipes = append(w.pipes, &pipe)
 }
 
-func (w *World) update(dt float64, spaceJustPressed bool) {
+func (w *World) update(dt float64, spaceJustPressed bool) (gameOver bool) {
 	w.player.update(dt, spaceJustPressed)
 
 	newPipes := make([]*Pipe, 0)
 	for _, pipe := range w.pipes {
 		pipe.update(dt)
+		if w.player.rect.Intersects(pipe.rect) {
+			gameOver = true
+		}
 		if pipe.rect.Max.X >= 0 {
 			newPipes = append(newPipes, pipe)
 		}
 	}
 	w.pipes = newPipes
+
+	return
 }
 
-func (w *World) draw() {
+func (w *World) draw(debug bool) {
+	if debug {
+		imd := imdraw.New(nil)
+		imd.Color = pixel.RGB(1, 0, 0)
+
+		for _, vert := range w.player.rect.Vertices() {
+			imd.Push(vert)
+		}
+		imd.Polygon(3)
+
+		for _, pipe := range w.pipes {
+			for _, vert := range pipe.rect.Vertices() {
+				imd.Push(vert)
+			}
+			imd.Polygon(3)
+		}
+
+		imd.Draw(*w.target)
+	}
+
 	w.player.draw(w.target, w.playerSprite)
 	for _, pipe := range w.pipes {
 		pipe.draw(w.target, w.pipeSprite)

@@ -14,6 +14,8 @@ import (
 	"golang.org/x/image/font/basicfont"
 )
 
+const debug bool = true
+
 func loadSprite(path string) *pixel.Sprite {
 	file, err := os.Open(path)
 	if err != nil {
@@ -89,12 +91,15 @@ func run() {
 		}
 
 		// Game logic
-		world.update(dt, win.JustPressed(pixelgl.KeySpace))
+		gameOver := world.update(dt, win.JustPressed(pixelgl.KeySpace))
+		if gameOver {
+			break
+		}
 
 		// Drawing
 		win.Clear(colornames.Skyblue)
 
-		world.draw()
+		world.draw(debug)
 
 		scoreText.Clear()
 		fmt.Fprintf(scoreText, "Score: %d", world.player.score)
