@@ -77,7 +77,6 @@ func run() {
 
 		// Delta time calculations
 		dt := time.Since(lastTime).Seconds()
-		_ = dt
 		lastTime = time.Now()
 
 		// FPS calculations
