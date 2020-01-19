@@ -1,8 +1,11 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"math/rand"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/faiface/pixel"
@@ -14,11 +17,40 @@ import (
 
 const debug bool = false
 
-func setupWindow() *pixelgl.Window {
-	cfg := pixelgl.WindowConfig{
-		Bounds: pixel.R(0, 0, 1024, 768),
-		//VSync:  true,
+func handleFlags() pixelgl.WindowConfig {
+	vSync := flag.Bool("vsync", false, "Enable VSync")
+	resolutionStr := flag.String("resolution", "1024x768", "Window resolution")
+
+	flag.Parse()
+
+	resolution := strings.Split(*resolutionStr, "x")
+	if len(resolution) != 2 {
+		panic("Resolution must be in <WIDTH>x<HEIGHT> format.")
 	}
+
+	width, err := strconv.Atoi(resolution[0])
+	if err != nil {
+		panic(err)
+	}
+
+	height, err := strconv.Atoi(resolution[1])
+	if err != nil {
+		panic(err)
+	}
+
+	if width <= 0 || height <= 0 {
+		panic("Both width and height must be positive.")
+	}
+
+	cfg := pixelgl.WindowConfig{
+		Bounds: pixel.R(0, 0, float64(width), float64(height)),
+		VSync:  *vSync,
+	}
+	return cfg
+}
+
+func setupWindow() *pixelgl.Window {
+	cfg := handleFlags()
 
 	win, err := pixelgl.NewWindow(cfg)
 	if err != nil {
