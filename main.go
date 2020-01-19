@@ -51,7 +51,8 @@ func run() {
 	var (
 		pipeSprite   = loadSprite("img/pipe.png")
 		playerSprite = loadSprite("img/gopher.png")
-		world        = newWorld(pipeSprite, playerSprite, win)
+		drawTarget   = pixel.Target(win)
+		world        = newWorld(&drawTarget, win.Bounds(), pipeSprite, playerSprite)
 	)
 
 	var (
@@ -76,11 +77,10 @@ func run() {
 		}
 
 		// Game logic
-		world.player.updatePosition(dt, win.JustPressed(pixelgl.KeySpace))
+		world.update(dt, win.JustPressed(pixelgl.KeySpace))
 
 		// Drawing
 		win.Clear(colornames.Skyblue)
-
 		world.draw()
 
 		pipeMat := pixel.IM.Moved(pixel.V(0, -pipeSprite.Frame().H()/2))

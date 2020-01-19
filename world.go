@@ -2,11 +2,11 @@ package main
 
 import (
 	"github.com/faiface/pixel"
-	"github.com/faiface/pixel/pixelgl"
 )
 
 type World struct {
-	targetWin *pixelgl.Window
+	target     *pixel.Target
+	targetRect pixel.Rect
 
 	pipeSprite *pixel.Sprite
 	pipes      []*Pipe
@@ -20,17 +20,28 @@ type Pipe struct {
 }
 
 func newWorld(
+	target *pixel.Target,
+	targetRect pixel.Rect,
 	pipeSprite *pixel.Sprite,
 	playerSprite *pixel.Sprite,
-	targetWin *pixelgl.Window,
 ) *World {
 	player := newPlayer(
 		playerSprite.Frame(),
-		pixel.V(targetWin.Bounds().W()/4, targetWin.Bounds().Center().Y),
+		pixel.V(targetRect.W()/4, targetRect.Center().Y),
 	)
-	return &World{targetWin: targetWin, pipeSprite: pipeSprite, playerSprite: playerSprite, player: player}
+	return &World{
+		target:       target,
+		targetRect:   targetRect,
+		pipeSprite:   pipeSprite,
+		playerSprite: playerSprite,
+		player:       player,
+	}
+}
+
+func (w *World) update(dt float64, spaceJustPressed bool) {
+	w.player.updatePosition(dt, spaceJustPressed)
 }
 
 func (w *World) draw() {
-	w.player.draw(w.targetWin, w.playerSprite)
+	w.player.draw(w.target, w.playerSprite)
 }

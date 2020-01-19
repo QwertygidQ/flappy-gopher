@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/faiface/pixel"
-	"github.com/faiface/pixel/pixelgl"
 )
 
 type Player struct {
@@ -28,8 +27,8 @@ func (p *Player) updatePosition(dt float64, spacePressed bool) {
 	p.rect = p.rect.Moved(pixel.V(0, dt*p.ySpeed))
 }
 
-func (p *Player) draw(win *pixelgl.Window, sprite *pixel.Sprite) {
+func (p *Player) draw(target *pixel.Target, sprite *pixel.Sprite) {
 	playerMat := pixel.IM.Scaled(pixel.ZV, .15)
 	playerMat = playerMat.Moved(p.rect.Min)
-	sprite.Draw(win, playerMat)
+	sprite.Draw(*target, playerMat)
 }
