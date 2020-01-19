@@ -15,7 +15,7 @@ import (
 	"golang.org/x/image/font/basicfont"
 )
 
-const debug bool = true
+const debug bool = false
 
 func loadSprite(path string) *pixel.Sprite {
 	file, err := os.Open(path)
@@ -58,11 +58,16 @@ func run() {
 		scoreText  = text.New(pixel.V(15, win.Bounds().H()-30), basicAtlas)
 	)
 
+	soundHandler := initBeep(48000)
+	soundHandler.loadSound("snd/jetpack.wav", "jetpack")
+	soundHandler.loadSound("snd/pipe_passed.wav", "pipe_passed")
+	soundHandler.playSound("jetpack", true)
+
 	var (
 		pipeSprite   = loadSprite("img/pipe.png")
 		playerSprite = loadSprite("img/gopher.png")
 		drawTarget   = pixel.Target(win)
-		world        = newWorld(&drawTarget, win.Bounds(), pipeSprite, playerSprite)
+		world        = newWorld(&drawTarget, win.Bounds(), soundHandler, pipeSprite, playerSprite)
 	)
 	world.makePipe()
 
@@ -102,6 +107,11 @@ func run() {
 		scoreText.Clear()
 		fmt.Fprintf(scoreText, "Score: %d", world.player.score)
 		scoreText.Draw(win, pixel.IM.Scaled(scoreText.Orig, 2))
+	}
+
+	fmt.Printf("Thanks for playing! Final score: %d\n", world.player.score)
+	for _, decoded := range soundHandler.decoded {
+		decoded.streamer.Close()
 	}
 }
 

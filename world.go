@@ -12,6 +12,8 @@ type World struct {
 	target     *pixel.Target
 	targetRect pixel.Rect
 
+	soundHandler *SoundHandler
+
 	pipeSprite *pixel.Sprite
 	pipes      []*Pipe
 	pipeTicker <-chan time.Time
@@ -23,6 +25,7 @@ type World struct {
 func newWorld(
 	target *pixel.Target,
 	targetRect pixel.Rect,
+	soundHandler *SoundHandler,
 	pipeSprite *pixel.Sprite,
 	playerSprite *pixel.Sprite,
 ) *World {
@@ -33,6 +36,7 @@ func newWorld(
 	return &World{
 		target:       target,
 		targetRect:   targetRect,
+		soundHandler: soundHandler,
 		pipeSprite:   pipeSprite,
 		playerSprite: playerSprite,
 		pipeTicker:   time.Tick(time.Second * 3),
@@ -70,6 +74,7 @@ func (w *World) update(dt float64, spaceJustPressed bool) (gameOver bool) {
 			gameOver = true
 			return
 		} else if !pipe.passed && w.player.rect.Center().X >= pipe.rect.Center().X {
+			w.soundHandler.playSound("pipe_passed", false)
 			w.player.score++
 			pipe.passed = true
 		}
